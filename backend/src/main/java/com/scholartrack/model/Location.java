@@ -1,48 +1,63 @@
 package com.scholartrack.model;
 
-import jakarta.persistence.*;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.UUID;
 
-@Entity
-@Table(name = "locations")
-public class Location {
+import jakarta.persistence.*;
 
+@Entity
+@Table(name="location")
+@JsonIgnoreProperties({"parent"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Location {
     @Id
-    @GeneratedValue
-    @Column(nullable = false, updatable = false)
+    @GeneratedValue( strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private String province;
+    @Column(name="name")
+    private String name;
+    
+    @Column(name="code")
+    private String code;
 
-    @Column(nullable = false)
-    private String district;
+    @Enumerated(EnumType.STRING)
+    private ELocation type;
 
-    @Column(nullable = false)
-    private String sector;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Location parent;
 
-    @Column(nullable = false)
-    private String cell;
+    public UUID getId() {
+        return id;
+    }
+    public void setId(UUID id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getCode() {
+        return code;
+    }
+    public void setCode(String code) {
+        this.code = code;
+    }
+    public ELocation getType() {
+        return type;
+    }
+    public void setType(ELocation type) {
+        this.type = type;
+    }
+    public Location getParent() {
+        return parent;
+    }
+    public void setParent(Location parent) {
+        this.parent = parent;
+    }
 
-    @Column(nullable = false)
-    private String village;
-
-    @OneToMany(mappedBy = "location", fetch = FetchType.LAZY)
-    private List<Student> students;
-
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public String getProvince() { return province; }
-    public void setProvince(String province) { this.province = province; }
-    public String getDistrict() { return district; }
-    public void setDistrict(String district) { this.district = district; }
-    public String getSector() { return sector; }
-    public void setSector(String sector) { this.sector = sector; }
-    public String getCell() { return cell; }
-    public void setCell(String cell) { this.cell = cell; }
-    public String getVillage() { return village; }
-    public void setVillage(String village) { this.village = village; }
-    public List<Student> getStudents() { return students; }
-    public void setStudents(List<Student> students) { this.students = students; }
+    
 }

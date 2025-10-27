@@ -1,15 +1,16 @@
 package com.scholartrack.model;
 
+// import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+// import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "students", indexes = {
-        @Index(name = "idx_student_email", columnList = "email", unique = true),
-        @Index(name = "idx_student_number", columnList = "student_number", unique = true)
-})
+@Table(name = "students")
+// @JsonIgnoreProperties({"studentCourses", "performances", "attendanceRecords"})
+// @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Student {
 
     @Id
@@ -42,7 +43,7 @@ public class Student {
     @Column(nullable = false)
     private Status status = Status.ACTIVE;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 

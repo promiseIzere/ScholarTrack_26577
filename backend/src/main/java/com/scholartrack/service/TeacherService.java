@@ -18,6 +18,9 @@ public class TeacherService {
     private TeacherRepository teacherRepository;
 
     public Teacher create(Teacher teacher) {
+        if (teacher.getTeacherId() == null || teacher.getTeacherId().trim().isEmpty()) {
+            teacher.setTeacherId(generateNextTeacherId());
+        }
         return teacherRepository.save(teacher);
     }
 
@@ -32,8 +35,8 @@ public class TeacherService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Teacher> findByEmployeeId(String employeeId) {
-        return teacherRepository.findByEmployeeId(employeeId);
+    public Optional<Teacher> findByTeacherId(String teacherId) {
+        return teacherRepository.findByTeacherId(teacherId);
     }
 
     @Transactional(readOnly = true)
@@ -41,10 +44,10 @@ public class TeacherService {
         return teacherRepository.findByEmail(email);
     }
 
-    @Transactional(readOnly = true)
-    public List<Teacher> findByDepartment(String department) {
-        return teacherRepository.findByDepartment(department);
-    }
+    // @Transactional(readOnly = true)
+    // public List<Teacher> findByDepartment(String department) {
+    //     return teacherRepository.findByDepartment(department);
+    // }
 
     @Transactional(readOnly = true)
     public List<Teacher> findByStatus(Teacher.Status status) {
@@ -58,12 +61,12 @@ public class TeacherService {
 
     public Optional<Teacher> update(UUID id, Teacher update) {
         return teacherRepository.findById(id).map(existing -> {
-            existing.setEmployeeId(update.getEmployeeId());
+            existing.setTeacherId(update.getTeacherId());
             existing.setFirstName(update.getFirstName());
             existing.setLastName(update.getLastName());
             existing.setEmail(update.getEmail());
             existing.setPhone(update.getPhone());
-            existing.setDepartment(update.getDepartment());
+            // existing.setDepartment(update.getDepartment());
             existing.setHireDate(update.getHireDate());
             existing.setStatus(update.getStatus());
             existing.setUser(update.getUser());
@@ -73,5 +76,47 @@ public class TeacherService {
 
     public void delete(UUID id) {
         teacherRepository.deleteById(id);
+    }
+
+    
+        /**
+     * Generates the next teacher ID automatically.
+     * Format: TEA001, TEA002, TEA003, etc.
+     * 
+     * @return the next available teacher ID
+     */
+    private String generateNextTeacherId() {
+        // Get the highest existing teacher ID
+        String lastTeacherId = teacherRepository.findTopByOrderByTeacherIdDesc()
+            .map(Teacher::getTeacherId)
+            .orElse("TEA000");
+        
+        // Extract the numeric part and increment it
+        String prefix = "TEA";
+        
+        // Ensure the teacher ID starts with the prefix
+        if (!lastTeacherId.startsWith(prefix)) {
+            return "TEA001";
+        }
+        
+        String numericPart = lastTeacherId.substring(prefix.length());
+        
+        try {
+            int nextNumber = Integer.parseInt(numericPart) + 1;
+            return String.format("%s%03d", prefix, nextNumber);
+        } catch (NumberFormatException e) {
+            // If parsing fails, start from 1
+            return "TEA001";
+        }
+    }
+
+    public Teacher getTeacherById(UUID id) {
+        Teacher teacher = teacherRepository.findById(id).orElse(null);
+        if(teacher == null) {
+            System.out.println("Teacher not found with ID: " + id);
+            return null;
+        } else {
+            return teacher;
+        }
     }
 }

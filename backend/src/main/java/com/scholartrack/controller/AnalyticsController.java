@@ -4,6 +4,7 @@ import com.scholartrack.model.PerformanceReport;
 import com.scholartrack.service.AnalyticsService;
 import com.scholartrack.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +26,9 @@ public class AnalyticsController {
     public ResponseEntity<PerformanceReport> getStudentReport(@PathVariable UUID studentId) {
         return studentService.findById(studentId)
                 .map(student -> ResponseEntity.ok(analyticsService.buildStudentReport(student)))
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    // do we need this?
     @GetMapping("/student/{studentId}/report/date-range")
     public ResponseEntity<PerformanceReport> getStudentReportWithDateRange(
             @PathVariable UUID studentId,
@@ -37,7 +37,7 @@ public class AnalyticsController {
         return studentService.findById(studentId)
                 .map(student -> ResponseEntity.ok(analyticsService.buildStudentReport(
                         student, LocalDate.parse(startDate), LocalDate.parse(endDate))))
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/student/{studentId}/stats")

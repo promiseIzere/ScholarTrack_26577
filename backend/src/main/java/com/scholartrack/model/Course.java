@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "courses", indexes = {
-        @Index(name = "idx_course_code", columnList = "course_code", unique = true)
-})
+@Table(name = "courses")
 public class Course {
 
     @Id

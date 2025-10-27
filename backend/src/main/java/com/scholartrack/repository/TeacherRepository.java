@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface TeacherRepository extends JpaRepository<Teacher, UUID> {
     
-    Optional<Teacher> findByEmployeeId(String employeeId);
+    Optional<Teacher> findByTeacherId(String teacherId);
     Optional<Teacher> findByEmail(String email);
     
     @Query("SELECT t FROM Teacher t WHERE t.department = :department")
@@ -28,6 +28,8 @@ public interface TeacherRepository extends JpaRepository<Teacher, UUID> {
     @Query("SELECT t FROM Teacher t WHERE t.firstName LIKE %:name% OR t.lastName LIKE %:name%")
     List<Teacher> findByNameContaining(@Param("name") String name);
     
-    boolean existsByEmployeeId(String employeeId);
+    boolean existsByTeacherId(String teacherId);
     boolean existsByEmail(String email);
+
+    Optional<Teacher> findTopByOrderByTeacherIdDesc();
 }

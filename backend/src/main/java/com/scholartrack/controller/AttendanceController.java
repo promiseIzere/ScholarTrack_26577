@@ -3,6 +3,7 @@ package com.scholartrack.controller;
 import com.scholartrack.model.Attendance;
 import com.scholartrack.service.AttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class AttendanceController {
     public ResponseEntity<Attendance> getAttendanceById(@PathVariable UUID id) {
         return attendanceService.findById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
@@ -69,13 +70,13 @@ public class AttendanceController {
     public ResponseEntity<Attendance> updateAttendance(@PathVariable UUID id, @RequestBody Attendance attendance) {
         return attendanceService.update(id, attendance)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAttendance(@PathVariable UUID id) {
         attendanceService.delete(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/student/{studentId}/stats")

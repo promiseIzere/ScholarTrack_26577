@@ -3,6 +3,7 @@ package com.scholartrack.controller;
 import com.scholartrack.model.Teacher;
 import com.scholartrack.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,55 +25,59 @@ public class TeacherController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Teacher> getTeacherById(@PathVariable UUID id) {
-        return teacherService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Teacher teacher = teacherService.getTeacherById(id); // get teacher by id from service
+        if (teacher != null) {
+            return new ResponseEntity<>(teacher, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @GetMapping("/employee/{employeeId}")
-    public ResponseEntity<Teacher> getTeacherByEmployeeId(@PathVariable String employeeId) {
-        return teacherService.findByEmployeeId(employeeId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+
+    @GetMapping("/teacher/{teacherId}")
+    public ResponseEntity<Teacher> getTeacherByTeacherId(@PathVariable String teacherId) {
+        return teacherService.findByTeacherId(teacherId)
+                .map(teacher -> new ResponseEntity<>(teacher, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/email/{email}")
     public ResponseEntity<Teacher> getTeacherByEmail(@PathVariable String email) {
         return teacherService.findByEmail(email)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(teacher -> new ResponseEntity<>(teacher, HttpStatus.FOUND))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping("/department/{department}")
-    public ResponseEntity<List<Teacher>> getTeachersByDepartment(@PathVariable String department) {
-        return ResponseEntity.ok(teacherService.findByDepartment(department));
-    }
+    // @GetMapping("/department/{department}")
+    // public ResponseEntity<List<Teacher>> getTeachersByDepartment(@PathVariable String department) {
+    //     return new ResponseEntity<>(teacherService.findByDepartment(department), HttpStatus.FOUND);
+    // }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Teacher>> getTeachersByStatus(@PathVariable Teacher.Status status) {
-        return ResponseEntity.ok(teacherService.findByStatus(status));
+        return new ResponseEntity<>(teacherService.findByStatus(status), HttpStatus.FOUND);
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<Teacher>> searchTeachersByName(@RequestParam String name) {
-        return ResponseEntity.ok(teacherService.findByNameContaining(name));
+        return new ResponseEntity<>(teacherService.findByNameContaining(name), HttpStatus.FOUND);
     }
 
     @PostMapping
     public ResponseEntity<Teacher> createTeacher(@RequestBody Teacher teacher) {
-        return ResponseEntity.ok(teacherService.create(teacher));
+        return new ResponseEntity<>(teacherService.create(teacher), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Teacher> updateTeacher(@PathVariable UUID id, @RequestBody Teacher teacher) {
         return teacherService.update(id, teacher)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(updatedTeacher -> new ResponseEntity<>(updatedTeacher, HttpStatus.FOUND))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTeacher(@PathVariable UUID id) {
         teacherService.delete(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
