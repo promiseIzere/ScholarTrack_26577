@@ -16,14 +16,14 @@ public interface TeacherRepository extends JpaRepository<Teacher, UUID> {
     Optional<Teacher> findByTeacherId(String teacherId);
     Optional<Teacher> findByEmail(String email);
     
-    @Query("SELECT t FROM Teacher t WHERE t.department = :department")
-    List<Teacher> findByDepartment(@Param("department") String department);
+    // @Query("SELECT t FROM Teacher t WHERE t.department = :department")
+    // List<Teacher> findByDepartment(@Param("department") String department);
     
     @Query("SELECT t FROM Teacher t WHERE t.status = :status")
     List<Teacher> findByStatus(@Param("status") Teacher.Status status);
     
-    @Query("SELECT t FROM Teacher t WHERE t.department = :department AND t.status = :status")
-    List<Teacher> findByDepartmentAndStatus(@Param("department") String department, @Param("status") Teacher.Status status);
+    // @Query("SELECT t FROM Teacher t WHERE t.department = :department AND t.status = :status")
+    // List<Teacher> findByDepartmentAndStatus(@Param("department") String department, @Param("status") Teacher.Status status);
     
     @Query("SELECT t FROM Teacher t WHERE t.firstName LIKE %:name% OR t.lastName LIKE %:name%")
     List<Teacher> findByNameContaining(@Param("name") String name);

@@ -3,14 +3,16 @@ package com.scholartrack.controller;
 import com.scholartrack.model.Course;
 import com.scholartrack.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/courses")
+@RequestMapping(value = "/api/courses")
 @CrossOrigin(origins = "*")
 public class CourseController {
 
@@ -19,33 +21,64 @@ public class CourseController {
 
     @GetMapping
     public ResponseEntity<List<Course>> getAllCourses() {
-        return ResponseEntity.ok(courseService.findAll());
+        List<Course> courses = courseService.findAll();
+        return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> getCourseById(@PathVariable UUID id) {
-        return courseService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> getCourseById(@PathVariable UUID id) {
+        Optional<Course> course = courseService.findById(id);
+        
+        if (course.isPresent()) {
+            return new ResponseEntity<>(course.get(), HttpStatus.OK);
+        }
+        
+        return new ResponseEntity<>("course with id " + id + " not found", HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
-    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
-        return ResponseEntity.ok(courseService.create(course));
+
+    @GetMapping("/code/{courseCode}")
+    public ResponseEntity<?> getCourseByCourseCode(@PathVariable String courseCode) {
+        Optional<Course> course = courseService.findByCourseCode(courseCode);
+        
+        if (course.isPresent()) {
+            return new ResponseEntity<>(course.get(), HttpStatus.OK);
+        }
+        
+        return new ResponseEntity<>("course with code " + courseCode + " not found", HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse(@PathVariable UUID id, @RequestBody Course course) {
-        return courseService.update(id, course)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @PostMapping(value = "/create")
+    public ResponseEntity<?> createCourse(@RequestBody Course course) {
+        String teacherId = course.getTeacherId();
+        Course savedCourse = courseService.createCourse(teacherId, course);
+        return new ResponseEntity<Course>(savedCourse, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable UUID id) {
-        courseService.delete(id);
-        return ResponseEntity.noContent().build();
+    @PutMapping(value = "/update/{courseCode}")
+    public ResponseEntity<?> updateCourse(@PathVariable String courseCode, @RequestBody Course courseDetails) {
+        try {
+            String teacherId = courseDetails.getTeacherId();
+            Course updatedCourse = courseService.updateCourse(courseCode, teacherId, courseDetails);
+            return new ResponseEntity<>(updatedCourse, HttpStatus.OK);
+        } catch (Exception e) {
+            if (e.getMessage().contains("not found")) {
+                return new ResponseEntity<>("course with code " + courseCode + " not found", HttpStatus.NOT_FOUND);
+            } else if (e.getMessage().contains("already exists")) {
+                return new ResponseEntity<>("course code " + courseDetails.getCourseCode() + " is already in use", HttpStatus.CONFLICT);
+            } else {
+                return new ResponseEntity<>("We were not able to update the course", HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    @DeleteMapping(value = "/{courseCode}")
+    public ResponseEntity<?> deleteCourse(@PathVariable String courseCode) {
+        try {
+            courseService.deleteCourse(courseCode);
+            return new ResponseEntity<>("course with code " + courseCode + " deleted", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>("We were not able to delete the course", HttpStatus.NOT_FOUND);
+        }
     }
 }
-
-

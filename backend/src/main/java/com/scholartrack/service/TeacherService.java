@@ -110,13 +110,4 @@ public class TeacherService {
         }
     }
 
-    public Teacher getTeacherById(UUID id) {
-        Teacher teacher = teacherRepository.findById(id).orElse(null);
-        if(teacher == null) {
-            System.out.println("Teacher not found with ID: " + id);
-            return null;
-        } else {
-            return teacher;
-        }
-    }
 }

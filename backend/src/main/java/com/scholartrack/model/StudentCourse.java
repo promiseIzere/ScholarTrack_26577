@@ -1,5 +1,7 @@
 package com.scholartrack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -14,12 +16,14 @@ public class StudentCourse {
     @Column(nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "student_id", nullable = false)
+    @JsonIgnore
     private Student student;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "course_id", nullable = false)
+    @JsonIgnore
     private Course course;
 
     @Column(name = "enrollment_date", nullable = false)
@@ -33,4 +37,15 @@ public class StudentCourse {
     public void setCourse(Course course) { this.course = course; }
     public LocalDate getEnrollmentDate() { return enrollmentDate; }
     public void setEnrollmentDate(LocalDate enrollmentDate) { this.enrollmentDate = enrollmentDate; }
+
+    // Computed, serialized properties for readability
+    @JsonProperty("studentNumber")
+    public String getStudentNumber() {
+        return student != null ? student.getStudentNumber() : null;
+    }
+
+    @JsonProperty("courseCode")
+    public String getCourseCode() {
+        return course != null ? course.getCourseCode() : null;
+    }
 }

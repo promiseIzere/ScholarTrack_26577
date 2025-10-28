@@ -25,7 +25,7 @@ public class TeacherController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Teacher> getTeacherById(@PathVariable UUID id) {
-        Teacher teacher = teacherService.getTeacherById(id); // get teacher by id from service
+        Teacher teacher = teacherService.findById(id).orElse(null); // get teacher by id from service
         if (teacher != null) {
             return new ResponseEntity<>(teacher, HttpStatus.OK);
         } else {

@@ -1,7 +1,7 @@
 package com.scholartrack.model;
 
-// import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-// import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -9,8 +9,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "students")
-// @JsonIgnoreProperties({"studentCourses", "performances", "attendanceRecords"})
-// @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({"studentCourses", "performances", "attendanceRecords", "hibernateLazyInitializer", "handler"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Student {
 
     @Id

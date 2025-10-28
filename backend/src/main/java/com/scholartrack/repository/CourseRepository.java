@@ -13,6 +13,7 @@ import java.util.UUID;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID> {
     Optional<Course> findByCourseCode(String courseCode);
+    Optional<Course> findById(UUID id);
 
     @Query("SELECT c FROM Course c WHERE c.courseName LIKE %:name%")
     List<Course> findByCourseNameContaining(@Param("name") String name);

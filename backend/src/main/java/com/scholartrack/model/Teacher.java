@@ -1,5 +1,6 @@
 package com.scholartrack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -44,9 +45,11 @@ public class Teacher {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
-    @OneToMany(mappedBy = "instructor", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Course> courses;
 
     public enum Status {
@@ -56,20 +59,18 @@ public class Teacher {
     // Constructors
     public Teacher() {}
 
-    public Teacher(String firstName, String lastName, String email, String department, LocalDate hireDate) {
+    public Teacher(String firstName, String lastName, String email, LocalDate hireDate) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        // this.department = department;
         this.hireDate = hireDate;
     }
 
-    public Teacher(String teacherId, String firstName, String lastName, String email, String department, LocalDate hireDate) {
+    public Teacher(String teacherId, String firstName, String lastName, String email, LocalDate hireDate) {
         this.teacherId = teacherId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        // this.department = department;
         this.hireDate = hireDate;
     }
 
