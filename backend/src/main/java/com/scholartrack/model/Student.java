@@ -1,7 +1,7 @@
 package com.scholartrack.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+// import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -9,8 +9,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "students")
-@JsonIgnoreProperties({"studentCourses", "performances", "attendanceRecords", "hibernateLazyInitializer", "handler"})
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({ "studentCourses", "performances", "attendanceRecords", "hibernateLazyInitializer", "handler" })
+// @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Student {
 
     @Id
@@ -56,12 +56,15 @@ public class Student {
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Attendance> attendanceRecords;
 
-    public enum Status { ACTIVE, INACTIVE }
+    public enum Status {
+        ACTIVE, INACTIVE
+    }
 
-    // Constructors
-    public Student() {}
+    public Student() {
+    }
 
-    public Student(String studentNumber, String firstName, String lastName, String email, String gender, LocalDate dateOfBirth, Location location) {
+    public Student(String studentNumber, String firstName, String lastName, String email, String gender,
+            LocalDate dateOfBirth, Location location) {
         this.studentNumber = studentNumber;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -71,33 +74,107 @@ public class Student {
         this.location = location;
     }
 
-    // Getters and Setters
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public String getStudentNumber() { return studentNumber; }
-    public void setStudentNumber(String studentNumber) { this.studentNumber = studentNumber; }
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getGender() { return gender; }
-    public void setGender(String gender) { this.gender = gender; }
-    public LocalDate getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
-    public LocalDate getEnrollmentDate() { return enrollmentDate; }
-    public void setEnrollmentDate(LocalDate enrollmentDate) { this.enrollmentDate = enrollmentDate; }
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
-    public Location getLocation() { return location; }
-    public void setLocation(Location location) { this.location = location; }
-    public List<StudentCourse> getStudentCourses() { return studentCourses; }
-    public void setStudentCourses(List<StudentCourse> studentCourses) { this.studentCourses = studentCourses; }
-    public List<Performance> getPerformances() { return performances; }
-    public void setPerformances(List<Performance> performances) { this.performances = performances; }
-    public List<Attendance> getAttendanceRecords() { return attendanceRecords; }
-    public void setAttendanceRecords(List<Attendance> attendanceRecords) { this.attendanceRecords = attendanceRecords; }
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getStudentNumber() {
+        return studentNumber;
+    }
+
+    public void setStudentNumber(String studentNumber) {
+        this.studentNumber = studentNumber;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public LocalDate getEnrollmentDate() {
+        return enrollmentDate;
+    }
+
+    public void setEnrollmentDate(LocalDate enrollmentDate) {
+        this.enrollmentDate = enrollmentDate;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public List<StudentCourse> getStudentCourses() {
+        return studentCourses;
+    }
+
+    public void setStudentCourses(List<StudentCourse> studentCourses) {
+        this.studentCourses = studentCourses;
+    }
+
+    public List<Performance> getPerformances() {
+        return performances;
+    }
+
+    public void setPerformances(List<Performance> performances) {
+        this.performances = performances;
+    }
+
+    public List<Attendance> getAttendanceRecords() {
+        return attendanceRecords;
+    }
+
+    public void setAttendanceRecords(List<Attendance> attendanceRecords) {
+        this.attendanceRecords = attendanceRecords;
+    }
 }
-
-

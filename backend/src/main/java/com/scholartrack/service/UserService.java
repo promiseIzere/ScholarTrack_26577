@@ -1,7 +1,9 @@
 package com.scholartrack.service;
 
 import com.scholartrack.model.User;
+import com.scholartrack.model.Location;
 import com.scholartrack.repository.UserRepository;
+import com.scholartrack.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +20,26 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private LocationRepository locationRepository;
+
     public User create(User user) {
         user.setCreatedAt(LocalDateTime.now());
+        // Attach or create Location if provided
+        if (user.getLocation() != null) {
+            Location provided = user.getLocation();
+            Location attached = null;
+            if (provided.getId() != null) {
+                attached = locationRepository.findById(provided.getId()).orElse(null);
+            }
+            if (attached == null && provided.getCode() != null) {
+                attached = locationRepository.findByCode(provided.getCode()).orElse(null);
+            }
+            if (attached == null && (provided.getName() != null || provided.getCode() != null)) {
+                attached = locationRepository.save(provided);
+            }
+            user.setLocation(attached);
+        }
         return userRepository.save(user);
     }
 
@@ -63,6 +83,21 @@ public class UserService {
             existing.setRole(update.getRole());
             existing.setStatus(update.getStatus());
             existing.setUpdatedAt(LocalDateTime.now());
+            // Update location if provided
+            if (update.getLocation() != null) {
+                Location provided = update.getLocation();
+                Location attached = null;
+                if (provided.getId() != null) {
+                    attached = locationRepository.findById(provided.getId()).orElse(null);
+                }
+                if (attached == null && provided.getCode() != null) {
+                    attached = locationRepository.findByCode(provided.getCode()).orElse(null);
+                }
+                if (attached == null && (provided.getName() != null || provided.getCode() != null)) {
+                    attached = locationRepository.save(provided);
+                }
+                existing.setLocation(attached);
+            }
             return existing;
         });
     }

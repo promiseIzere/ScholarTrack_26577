@@ -3,6 +3,7 @@ package com.scholartrack.controller;
 import com.scholartrack.model.StudentCourse;
 import com.scholartrack.service.EnrollmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,11 @@ public class StudentCourseController {
     @Autowired
     private EnrollmentService enrollmentService;
 
+    @PostMapping
+    public ResponseEntity<StudentCourse> createStudentCourse(@RequestBody StudentCourse studentCourse) {
+        return ResponseEntity.ok(enrollmentService.create(studentCourse));
+    }
+
     @GetMapping
     public ResponseEntity<List<StudentCourse>> getAllStudentCourses() {
         return ResponseEntity.ok(enrollmentService.findAll());
@@ -25,15 +31,15 @@ public class StudentCourseController {
     @GetMapping("/{id}")
     public ResponseEntity<StudentCourse> getStudentCourseById(@PathVariable UUID id) {
         return enrollmentService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(studentCourse -> new ResponseEntity<>(studentCourse, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/student/{studentId}")
     public ResponseEntity<List<StudentCourse>> getStudentCoursesByStudentId(@PathVariable UUID studentId) {
         return ResponseEntity.ok(enrollmentService.findByStudentId(studentId));
     }
-
+// getting students enrolled in a course
     @GetMapping("/course/{courseId}")
     public ResponseEntity<List<StudentCourse>> getStudentCoursesByCourseId(@PathVariable UUID courseId) {
         return ResponseEntity.ok(enrollmentService.findByCourseId(courseId));
@@ -48,10 +54,6 @@ public class StudentCourseController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public ResponseEntity<StudentCourse> createStudentCourse(@RequestBody StudentCourse studentCourse) {
-        return ResponseEntity.ok(enrollmentService.create(studentCourse));
-    }
 
     @PostMapping("/enroll")
     public ResponseEntity<StudentCourse> enrollStudent(@RequestParam UUID studentId, 
@@ -68,16 +70,10 @@ public class StudentCourseController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudentCourse(@PathVariable UUID id) {
-        enrollmentService.delete(id);
+        enrollmentService.unenrollStudent(id, id);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/enrollment")
-    public ResponseEntity<Void> unenrollStudent(@RequestParam UUID studentId, 
-            @RequestParam UUID courseId) {
-        enrollmentService.unenrollStudent(studentId, courseId);
-        return ResponseEntity.ok().build();
-    }
 }
 
 

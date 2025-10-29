@@ -1,7 +1,6 @@
 package com.scholartrack.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.UUID;
 
 import jakarta.persistence.*;
@@ -9,7 +8,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name="location")
 @JsonIgnoreProperties({"parent"})
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Location {
     @Id
     @GeneratedValue( strategy = GenerationType.UUID)

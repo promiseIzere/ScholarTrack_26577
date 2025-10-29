@@ -165,21 +165,15 @@ public class EnrollmentController {
     @PutMapping("/{id}")
     public ResponseEntity<StudentCourse> updateEnrollment(@PathVariable UUID id, @RequestBody StudentCourse enrollment) {
         return enrollmentService.update(id, enrollment)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEnrollment(@PathVariable UUID id) {
-        enrollmentService.delete(id);
-        return ResponseEntity.noContent().build();
+                .map(updatedEnrollment -> new ResponseEntity<>(updatedEnrollment, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/unenroll")
     public ResponseEntity<Void> unenrollStudent(@RequestParam UUID studentId, 
             @RequestParam UUID courseId) {
         enrollmentService.unenrollStudent(studentId, courseId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/course/{courseId}/count")

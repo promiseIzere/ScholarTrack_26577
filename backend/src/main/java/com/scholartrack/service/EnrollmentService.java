@@ -134,10 +134,6 @@ public class EnrollmentService {
         });
     }
 
-    public void delete(UUID id) {
-        enrollmentRepository.deleteById(id);
-    }
-
     @Transactional(readOnly = true)
     public Long getStudentCountByCourseId(UUID courseId) {
         return enrollmentRepository.countByCourseId(courseId);
