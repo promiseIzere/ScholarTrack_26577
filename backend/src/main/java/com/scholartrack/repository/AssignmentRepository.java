@@ -25,6 +25,15 @@ public interface AssignmentRepository extends JpaRepository<Assignment, UUID> {
     
     @Query("SELECT a FROM Assignment a WHERE a.title LIKE %:title%")
     List<Assignment> findByTitleContaining(@Param("title") String title);
+
+    @Query("SELECT COUNT(a) > 0 FROM Assignment a WHERE a.course.courseCode = :courseCode AND a.title = :title")
+    boolean existsByCourse_CourseCodeAndTitle(@Param("courseCode") String courseCode, @Param("title") String title);
+
+    @Query("SELECT a FROM Assignment a WHERE a.course.courseCode = :courseCode")
+    List<Assignment> findByCourseCode(@Param("courseCode") String courseCode);
+
+    @Query("SELECT a FROM Assignment a WHERE a.course.courseCode = :courseCode AND a.title = :title")
+    List<Assignment> findByCourseCodeAndTitle(@Param("courseCode") String courseCode, @Param("title") String title);
 }
 
 

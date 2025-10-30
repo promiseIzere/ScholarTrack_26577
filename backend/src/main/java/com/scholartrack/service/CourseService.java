@@ -4,6 +4,8 @@ import com.scholartrack.model.Course;
 import com.scholartrack.model.Teacher;
 import com.scholartrack.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,16 +38,24 @@ public class CourseService {
     }
 
     @Transactional
-    public Course createCourse(String teacherId, Course course) {
+    public ResponseEntity<?> createCourse(String teacherId, Course course) {
         if (teacherId == null || teacherId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Teacher ID is required");
-        }
+            return new ResponseEntity<>("Teacher ID is required", HttpStatus.BAD_REQUEST);
+            }
 
         Teacher teacher = teacherService.findByTeacherId(teacherId)
-            .orElseThrow(() -> new IllegalArgumentException("Teacher not found with ID: " + teacherId));
-
+            .orElse(null);
+        if (teacher == null) {
+            return new ResponseEntity<>("Teacher not found with ID: " + teacherId, HttpStatus.NOT_FOUND);
+        }
         course.setTeacher(teacher);
-        return courseRepository.save(course);
+        if (course.getCourseCode() == null || course.getCourseCode().trim().isEmpty()) {
+            return new ResponseEntity<>("Course code is required", HttpStatus.BAD_REQUEST);
+        }
+        if (courseRepository.existsByCourseCode(course.getCourseCode())) {
+            return new ResponseEntity<>("Course with code " + course.getCourseCode() + " already exists", HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<Course>(courseRepository.save(course), HttpStatus.CREATED);
     }
 
     @Transactional

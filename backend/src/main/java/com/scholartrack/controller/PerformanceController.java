@@ -3,6 +3,7 @@ package com.scholartrack.controller;
 import com.scholartrack.model.Performance;
 import com.scholartrack.service.PerformanceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,20 +52,20 @@ public class PerformanceController {
 
     @PostMapping
     public ResponseEntity<Performance> createPerformance(@RequestBody Performance performance) {
-        return ResponseEntity.ok(performanceService.create(performance));
+        return new ResponseEntity<>(performanceService.create(performance), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Performance> updatePerformance(@PathVariable UUID id, @RequestBody Performance performance) {
         return performanceService.update(id, performance)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(updatedPerformance -> new ResponseEntity<>(updatedPerformance, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerformance(@PathVariable UUID id) {
         performanceService.delete(id);
-        return ResponseEntity.noContent().build();
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/submission")
@@ -72,26 +73,26 @@ public class PerformanceController {
             @RequestParam UUID studentId, 
             @RequestParam UUID assignmentId) {
         performanceService.deleteByStudentIdAndAssignmentId(studentId, assignmentId);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/student/{studentId}/average")
     public ResponseEntity<BigDecimal> getAverageScoreByStudentId(@PathVariable UUID studentId) {
-        return ResponseEntity.ok(performanceService.getAverageScoreByStudentId(studentId));
+        return new ResponseEntity<>(performanceService.getAverageScoreByStudentId(studentId), HttpStatus.OK);
     }
 
     @GetMapping("/assignment/{assignmentId}/average")
     public ResponseEntity<BigDecimal> getAverageScoreByAssignmentId(@PathVariable UUID assignmentId) {
-        return ResponseEntity.ok(performanceService.getAverageScoreByAssignmentId(assignmentId));
+        return new ResponseEntity<>(performanceService.getAverageScoreByAssignmentId(assignmentId), HttpStatus.OK);
     }
 
     @GetMapping("/student/{studentId}/count")
     public ResponseEntity<Long> getPerformanceCountByStudentId(@PathVariable UUID studentId) {
-        return ResponseEntity.ok(performanceService.getPerformanceCountByStudentId(studentId));
+        return new ResponseEntity<>(performanceService.getPerformanceCountByStudentId(studentId), HttpStatus.OK);
     }
 
     @GetMapping("/assignment/{assignmentId}/count")
     public ResponseEntity<Long> getPerformanceCountByAssignmentId(@PathVariable UUID assignmentId) {
-        return ResponseEntity.ok(performanceService.getPerformanceCountByAssignmentId(assignmentId));
+        return new ResponseEntity<>(performanceService.getPerformanceCountByAssignmentId(assignmentId), HttpStatus.OK);
     }
 }

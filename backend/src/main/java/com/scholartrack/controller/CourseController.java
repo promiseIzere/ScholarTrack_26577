@@ -21,8 +21,7 @@ public class CourseController {
 
     @GetMapping
     public ResponseEntity<List<Course>> getAllCourses() {
-        List<Course> courses = courseService.findAll();
-        return new ResponseEntity<>(courses, HttpStatus.OK);
+        return new ResponseEntity<>(courseService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -51,8 +50,8 @@ public class CourseController {
     @PostMapping(value = "/create")
     public ResponseEntity<?> createCourse(@RequestBody Course course) {
         String teacherId = course.getTeacherId();
-        Course savedCourse = courseService.createCourse(teacherId, course);
-        return new ResponseEntity<Course>(savedCourse, HttpStatus.CREATED);
+        ResponseEntity<?> savedCourse = courseService.createCourse(teacherId, course);
+        return savedCourse;
     }
 
     @PutMapping(value = "/update/{courseCode}")

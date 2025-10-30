@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "assignments", indexes = {
         @Index(name = "idx_assignment_course", columnList = "course_id")
@@ -18,7 +20,11 @@ public class Assignment {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
+    @JsonIgnore
     private Course course;
+
+    @Transient
+    private String courseCode;
 
     @Column(nullable = false)
     private String title;
@@ -78,5 +84,13 @@ public class Assignment {
 
     public void setMaxScore(BigDecimal maxScore) {
         this.maxScore = maxScore;
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
     }
 }

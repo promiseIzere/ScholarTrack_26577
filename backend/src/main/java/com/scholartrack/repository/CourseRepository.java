@@ -17,6 +17,7 @@ public interface CourseRepository extends JpaRepository<Course, UUID> {
 
     @Query("SELECT c FROM Course c WHERE c.courseName LIKE %:name%")
     List<Course> findByCourseNameContaining(@Param("name") String name);
+    boolean existsByCourseCode(String courseCode);
 }
 
 

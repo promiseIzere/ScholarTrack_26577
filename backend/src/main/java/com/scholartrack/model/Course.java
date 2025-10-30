@@ -1,8 +1,8 @@
 package com.scholartrack.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.UUID;
 
 @Entity
@@ -30,9 +30,9 @@ public class Course {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "teacher_id", referencedColumnName = "teacher_id")
     @JsonIgnoreProperties({"user", "courses"})
+    @JsonIgnore
     private Teacher teacher;
 
-    // Transient field to receive teacherId from JSON request
     @Transient
     private String teacherId;
 
@@ -54,12 +54,10 @@ public class Course {
     public Teacher getTeacher() { return teacher; }
     public void setTeacher(Teacher teacher) { this.teacher = teacher; }
     
-    // For receiving teacherId from JSON input
     public void setTeacherId(String teacherId) {
         this.teacherId = teacherId;
     }
     
-    @JsonIgnore
     public String getTeacherId() {
         if (teacherId != null) {
             return teacherId;

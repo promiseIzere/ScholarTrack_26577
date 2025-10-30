@@ -57,13 +57,6 @@ public class Teacher {
     public Teacher() {
     }
 
-    public Teacher(String firstName, String lastName, String email, LocalDate hireDate) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.hireDate = hireDate;
-    }
-
     public Teacher(String teacherId, String firstName, String lastName, String email, LocalDate hireDate) {
         this.teacherId = teacherId;
         this.firstName = firstName;
