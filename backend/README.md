@@ -8,27 +8,6 @@
 
 ---
 
-## 📋 Table of Contents
-
-- [Overview](#-overview)
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Configuration](#configuration)
-- [API Documentation](#-api-documentation)
-- [Database Schema](#-database-schema)
-- [Usage Examples](#-usage-examples)
-- [Performance Analytics](#-performance-analytics)
-- [Contributing](#-contributing)
-- [Troubleshooting](#-troubleshooting)
-- [License](#-license)
-- [Contact](#-contact)
-
----
-
 ## 🌟 Overview
 
 ScholarTrack is a modern academic management system designed to help educational institutions track and improve student performance. The system provides real-time insights into student attendance patterns, assignment submissions, and overall academic progress.
@@ -87,32 +66,6 @@ ScholarTrack solves these problems by automating data collection and providing i
 
 ---
 
-<!-- ## 🛠 Tech Stack
-
-### Backend
-- **Java 17+** - Modern Java features and performance
-- **Spring Boot 3.x** - Rapid application development framework
-- **Spring Data JPA** - Database abstraction and ORM
-- **Hibernate** - Object-relational mapping
-- **PostgreSQL** - Primary database (also supports MySQL, H2)
-- **Maven** - Dependency management and build tool
-
-### Architecture
-- **RESTful API** - Clean, stateless API design
-- **MVC Pattern** - Separation of concerns
-- **Repository Pattern** - Data access abstraction
-- **Service Layer** - Business logic encapsulation
-- **DTO Pattern** - Data transfer objects for API responses -->
-
-<!-- ### Database Features
-- **UUID Primary Keys** - Enhanced security and distributed system support
-- **Lazy Loading** - Optimized performance for large datasets
-- **Database Indexes** - Fast query performance on frequently accessed columns
-- **Foreign Key Constraints** - Data integrity enforcement
-- **Cascade Operations** - Automatic relationship management
-
---- -->
-
 ## 📁 Project Structure
 
 ```
@@ -163,33 +116,6 @@ scholartrack/
 │   │   │           │   ├── AssignmentController.java
 │   │   │           │   ├── PerformanceController.java
 │   │   │           │   └── AttendanceController.java
-│   │   │           │
-│   │   │          
-│   │   │           └── exception/           # Custom exceptions
-│   │   │               ├── ResourceNotFoundException.java
-│   │   │               └── GlobalExceptionHandler.java
-│   │   │
-│   │   └── resources/
-│   │       ├── application.properties       # Main configuration
-│   │       ├── application-dev.properties   # Development config
-│   │       └── application-prod.properties  # Production config
-│   │
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── scholartrack/
-│                   ├── service/              # Service tests
-│                   ├── controller/           # Controller tests
-│                   └── repository/           # Repository tests
-│
-├── docs/
-│   ├── API.md                               # API documentation
-│   ├── DATABASE.md                          # Database schema
-│   └── SETUP.md                             # Setup guide
-│
-├── pom.xml                                  # Maven dependencies
-├── README.md                                # This file
-└── LICENSE                                  # License information
 ```
 
 
@@ -336,6 +262,7 @@ Currently, the API uses basic role-based access. JWT authentication is planned f
 - Self-referencing for parent-child relationships
 
 
+<img width="2614" height="1424" alt="ScholarTrack (3)" src="https://github.com/user-attachments/assets/586fa96f-0ca0-4048-908e-a45d58f28f7d" />
 
 
 ---
