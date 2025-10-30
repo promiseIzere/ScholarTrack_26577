@@ -5,11 +5,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "assignments", indexes = {
-        @Index(name = "idx_assignment_course", columnList = "course_id")
+        @Index(name = "idx_assignment_course", columnList = "course_code")
 })
 public class Assignment {
 
@@ -19,8 +18,7 @@ public class Assignment {
     private UUID id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id", nullable = false)
-    @JsonIgnore
+    @JoinColumn(name = "course_code", referencedColumnName = "course_code", nullable = false)
     private Course course;
 
     @Transient
@@ -92,5 +90,5 @@ public class Assignment {
 
     public void setCourseCode(String courseCode) {
         this.courseCode = courseCode;
-    }
+    } 
 }

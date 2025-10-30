@@ -28,13 +28,13 @@ public interface PerformanceRepository extends JpaRepository<Performance, UUID> 
     @Query("SELECT AVG(p.score) FROM Performance p WHERE p.assignment.id = :assignmentId")
     BigDecimal findAverageScoreByAssignmentId(@Param("assignmentId") UUID assignmentId);
     
-    @Query("SELECT COUNT(p) FROM Performance p WHERE p.student.id = :studentId")
-    Long countByStudentId(@Param("studentId") UUID studentId);
+    
+    boolean existsByStudent_StudentNumberAndAssignment_Id(String studentNumber, UUID assignmentId);
     
     @Query("SELECT COUNT(p) FROM Performance p WHERE p.assignment.id = :assignmentId")
     Long countByAssignmentId(@Param("assignmentId") UUID assignmentId);
     
-    boolean existsByStudentIdAndAssignmentId(UUID studentId, UUID assignmentId);
+    // boolean existsByStudent_StudentNumberAndAssignment_Id(String studentNumber, UUID assignmentId);
     
     @Query("SELECT p FROM Performance p WHERE p.student.id = :studentId AND p.assignment.course.id = :courseId")
     List<Performance> findByStudentIdAndCourseId(@Param("studentId") UUID studentId, @Param("courseId") UUID courseId);

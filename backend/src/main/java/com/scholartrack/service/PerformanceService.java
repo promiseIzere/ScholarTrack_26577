@@ -1,8 +1,12 @@
 package com.scholartrack.service;
 
+import com.scholartrack.model.Assignment;
 import com.scholartrack.model.Performance;
+import com.scholartrack.model.Student;
 import com.scholartrack.repository.PerformanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +22,38 @@ public class PerformanceService {
     @Autowired
     private PerformanceRepository performanceRepository;
 
-    public Performance create(Performance performance) {
-        return performanceRepository.save(performance);
+    @Autowired
+    private com.scholartrack.repository.StudentRepository studentRepository;
+
+    @Autowired
+    private com.scholartrack.repository.AssignmentRepository assignmentRepository;
+
+    public ResponseEntity<?> createPerformance(Performance performance) {
+        String studentNumber = performance.getStudentNumber();
+        UUID assignmentId = performance.getAssignmentId();
+
+        if (studentNumber == null || studentNumber.trim().isEmpty() || assignmentId == null) {
+            return new ResponseEntity<>("studentNumber and assignmentId are required", HttpStatus.BAD_REQUEST);
+        }
+        Student student = studentRepository.findByStudentNumber(studentNumber).orElse(null);
+        if (student == null) {
+            return new ResponseEntity<>("Student number not found: " + studentNumber, HttpStatus.BAD_REQUEST);
+        }
+
+        Assignment assignment = assignmentRepository.findById(assignmentId)
+                .orElse(null);
+        if (assignment == null) {
+            return new ResponseEntity<>("Assignment not found: " + assignmentId, HttpStatus.BAD_REQUEST);
+        }
+        boolean exists = performanceRepository.existsByStudent_StudentNumberAndAssignment_Id(studentNumber, assignmentId);
+        if (exists) {
+            return new ResponseEntity<>("Performance already recorded for this student and assignment", HttpStatus.CONFLICT);
+        }
+        performance.setStudent(student);
+        performance.setAssignment(assignment);
+        Performance saved = performanceRepository.save(performance);
+
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
     @Transactional(readOnly = true)
@@ -57,10 +91,10 @@ public class PerformanceService {
         return performanceRepository.findAverageScoreByAssignmentId(assignmentId);
     }
 
-    @Transactional(readOnly = true)
-    public Long getPerformanceCountByStudentId(UUID studentId) {
-        return performanceRepository.countByStudentId(studentId);
-    }
+    // @Transactional(readOnly = true)
+    // public Long getPerformanceCountByStudentId(UUID studentId) {
+    //     return performanceRepository.countByStudentId(studentId);
+    // }
 
     @Transactional(readOnly = true)
     public Long getPerformanceCountByAssignmentId(UUID assignmentId) {

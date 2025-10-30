@@ -31,6 +31,12 @@ public class Performance {
     @Column(name = "submitted_at")
     private LocalDateTime submittedAt;
 
+    @Transient
+    private String studentNumber;
+
+    @Transient
+    private java.util.UUID assignmentId;
+
     public UUID getId() {
         return id;
     }
@@ -77,5 +83,21 @@ public class Performance {
 
     public void setSubmittedAt(LocalDateTime submittedAt) {
         this.submittedAt = submittedAt;
+    }
+    
+    public String getStudentNumber() {
+        return studentNumber;
+    }
+
+    public void setStudentNumber(String studentNumber) {
+        this.studentNumber = studentNumber;
+    }
+
+    public java.util.UUID getAssignmentId() {
+        return assignmentId;
+    }
+
+    public void setAssignmentId(java.util.UUID assignmentId) {
+        this.assignmentId = assignmentId;
     }
 }

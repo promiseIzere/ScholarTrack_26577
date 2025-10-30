@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -46,14 +48,30 @@ public class PerformanceController {
             @RequestParam UUID studentId, 
             @RequestParam UUID assignmentId) {
         return performanceService.findByStudentIdAndAssignmentId(studentId, assignmentId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(performance -> new ResponseEntity<>(performance, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
-    public ResponseEntity<Performance> createPerformance(@RequestBody Performance performance) {
-        return new ResponseEntity<>(performanceService.create(performance), HttpStatus.CREATED);
+    public ResponseEntity<?> createPerformance(@RequestBody Performance performance) {
+        ResponseEntity<?> response = performanceService.createPerformance(performance);
+        Performance saved = (Performance) response.getBody();
+
+        if (saved == null) {
+            return ResponseEntity.badRequest().body("Could not save performance.");
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", saved.getId());
+        data.put("student", saved.getStudent().getStudentNumber());
+        data.put("assignment", saved.getAssignment().getId());
+        data.put("score", saved.getScore());
+        data.put("feedback", saved.getFeedback());
+        data.put("submittedAt", saved.getSubmittedAt());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(data);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Performance> updatePerformance(@PathVariable UUID id, @RequestBody Performance performance) {
@@ -84,11 +102,6 @@ public class PerformanceController {
     @GetMapping("/assignment/{assignmentId}/average")
     public ResponseEntity<BigDecimal> getAverageScoreByAssignmentId(@PathVariable UUID assignmentId) {
         return new ResponseEntity<>(performanceService.getAverageScoreByAssignmentId(assignmentId), HttpStatus.OK);
-    }
-
-    @GetMapping("/student/{studentId}/count")
-    public ResponseEntity<Long> getPerformanceCountByStudentId(@PathVariable UUID studentId) {
-        return new ResponseEntity<>(performanceService.getPerformanceCountByStudentId(studentId), HttpStatus.OK);
     }
 
     @GetMapping("/assignment/{assignmentId}/count")

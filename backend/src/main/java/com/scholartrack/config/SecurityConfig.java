@@ -14,7 +14,6 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		// Development-friendly defaults: disable CSRF for APIs and allow all requests.
 		http
 			.csrf(AbstractHttpConfigurer::disable)
 			.cors(Customizer.withDefaults())
@@ -28,6 +27,7 @@ public class SecurityConfig {
 		return http.build();
 	}
 }
+
 
 
 

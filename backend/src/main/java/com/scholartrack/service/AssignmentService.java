@@ -30,11 +30,21 @@ public class AssignmentService {
         String title = assignment.getTitle();
         if (title == null || title.trim().isEmpty() || courseCode == null || courseCode.trim().isEmpty()) {
             return new ResponseEntity<>("Course code and title are required", HttpStatus.BAD_REQUEST);
-        } else if (assignmentRepository.findByCourseCode(courseCode).size() > 0) {
+        }
+
+        // Resolve course by courseCode
+        var courseOpt = courseRepository.findByCourseCode(courseCode);
+        if (courseOpt.isEmpty()) {
             return new ResponseEntity<>("Course with code " + courseCode + " not found", HttpStatus.NOT_FOUND);
-        } else if (assignmentRepository.findByCourseCodeAndTitle(courseCode, title).size() > 0) {
+        }
+
+        // Duplicate check: same courseCode + title
+        if (assignmentRepository.existsByCourse_CourseCodeAndTitle(courseCode, title)) {
             return new ResponseEntity<>("Assignment already exists for this course with the same title", HttpStatus.CONFLICT);
         }
+
+        // Set managed course entity and save
+        assignment.setCourse(courseOpt.get());
         return new ResponseEntity<>(assignmentRepository.save(assignment), HttpStatus.CREATED);
     }
 
@@ -44,14 +54,10 @@ public class AssignmentService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Assignment> findById(UUID id) {
-        return assignmentRepository.findById(id);
+    public List<Assignment> findByCourseCode(String courseCode) {
+        return assignmentRepository.findByCourseCode(courseCode);
     }
 
-    @Transactional(readOnly = true)
-    public List<Assignment> findByCourseId(UUID courseId) {
-        return assignmentRepository.findByCourseId(courseId);
-    }
 
     @Transactional(readOnly = true)
     public List<Assignment> findOverdueAssignments() {
@@ -79,7 +85,12 @@ public class AssignmentService {
         });
     }
 
-    public void delete(UUID id) {
-        assignmentRepository.deleteById(id);
+    public ResponseEntity<?> delete(String title) {
+        List<Assignment> assignments = assignmentRepository.findByTitle(title);
+        if (assignments.isEmpty()) {
+            return new ResponseEntity<>("Assignment with title " + title + " not found", HttpStatus.NOT_FOUND);
+        }
+        assignmentRepository.deleteAllByTitle(title);
+        return new ResponseEntity<>("Assignment with title " + title + " deleted successfully", HttpStatus.OK);
     }
 }

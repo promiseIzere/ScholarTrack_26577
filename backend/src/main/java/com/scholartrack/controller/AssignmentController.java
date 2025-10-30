@@ -24,12 +24,6 @@ public class AssignmentController {
         return new ResponseEntity<>(assignmentService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Assignment> getAssignmentById(@PathVariable UUID id) {
-        return assignmentService.findById(id)
-                .map(assignment -> new ResponseEntity<>(assignment, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
 
     @PostMapping
     public ResponseEntity<?> createAssignment(@RequestBody Assignment assignment) {
@@ -48,15 +42,16 @@ public class AssignmentController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAssignment(@PathVariable UUID id) {
-        assignmentService.delete(id);
+    @DeleteMapping("/{title}")
+    public ResponseEntity<Void> deleteAssignment(@PathVariable String title) {
+        assignmentService.delete(title);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/course/{courseId}")
-    public ResponseEntity<List<Assignment>> getAssignmentsByCourseId(@PathVariable UUID courseId) {
-        return new ResponseEntity<>(assignmentService.findByCourseId(courseId), HttpStatus.OK);
+
+    @GetMapping("/course/{courseCode}")
+    public ResponseEntity<List<Assignment>> getAssignmentsByCourseCode(@PathVariable String courseCode) {
+        return new ResponseEntity<>(assignmentService.findByCourseCode(courseCode), HttpStatus.OK);
     }
 
     @GetMapping("/overdue")

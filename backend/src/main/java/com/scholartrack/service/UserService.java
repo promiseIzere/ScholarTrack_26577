@@ -25,7 +25,6 @@ public class UserService {
 
     public User create(User user) {
         user.setCreatedAt(LocalDateTime.now());
-        // Attach or create Location if provided
         if (user.getLocation() != null) {
             Location provided = user.getLocation();
             Location attached = null;
