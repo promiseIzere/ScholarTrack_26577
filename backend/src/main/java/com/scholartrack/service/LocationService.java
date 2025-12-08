@@ -31,7 +31,6 @@ public class LocationService {
             Optional<Location> getParent = locationRepo.findByCode(parentCode);
 
             if(getParent.isPresent()){
-                //bind the parent to child
                 location.setParent(getParent.get());
 
                     if(!locationRepo.existsByCode(location.getCode())){
@@ -67,5 +66,46 @@ public class LocationService {
         else{
             return "No location found";
         }
+    }
+
+    public Optional<Location> updateByCode(String code, Location updates){
+        Optional<Location> existingOpt = locationRepo.findByCode(code);
+        if(existingOpt.isEmpty()){
+            return Optional.empty();
+        }
+
+        Location existing = existingOpt.get();
+
+        if(updates.getName() != null){
+            existing.setName(updates.getName());
+        }
+        if(updates.getCode() != null){
+            existing.setCode(updates.getCode());
+        }
+        if(updates.getType() != null){
+            existing.setType(updates.getType());
+        }
+        if(updates.getParent() != null){
+            Location providedParent = updates.getParent();
+            if(providedParent.getId() != null){
+                locationRepo.findById(providedParent.getId()).ifPresent(existing::setParent);
+            } else if(providedParent.getCode() != null){
+                locationRepo.findByCode(providedParent.getCode()).ifPresent(existing::setParent);
+            } else {
+                existing.setParent(null);
+            }
+        }
+
+        return Optional.of(locationRepo.save(existing));
+    }
+
+
+    public boolean deleteByCode(String code){
+        Optional<Location> existing = locationRepo.findByCode(code);
+        if(existing.isEmpty()){
+            return false;
+        }
+        locationRepo.delete(existing.get());
+        return true;
     }
 }

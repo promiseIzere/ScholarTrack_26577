@@ -7,7 +7,8 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Table(name = "student_courses", uniqueConstraints = @UniqueConstraint(columnNames = { "student_id", "course_id" }))
+@Table(name = "student_courses", uniqueConstraints = @UniqueConstraint(columnNames = { "student_number",
+        "course_code" }))
 public class StudentCourse {
 
     @Id
@@ -16,12 +17,12 @@ public class StudentCourse {
     private UUID id;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(name = "student_number", referencedColumnName = "student_number", nullable = false)
     @JsonIgnore
     private Student student;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "course_id", nullable = false)
+    @JoinColumn(name = "course_code", referencedColumnName = "course_code", nullable = false)
     @JsonIgnore
     private Course course;
 

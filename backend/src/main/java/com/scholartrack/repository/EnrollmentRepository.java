@@ -6,34 +6,26 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface EnrollmentRepository extends JpaRepository<StudentCourse, UUID> {
-    
-    @Query("SELECT sc FROM StudentCourse sc WHERE sc.student.id = :studentId AND sc.course.id = :courseId")
-    Optional<StudentCourse> findByStudentIdAndCourseId(@Param("studentId") UUID studentId, @Param("courseId") UUID courseId);
 
-    @Query("SELECT sc FROM StudentCourse sc WHERE sc.student.id = :studentId")
-    List<StudentCourse> findByStudentId(@Param("studentId") UUID studentId);
+    @Query("SELECT sc FROM StudentCourse sc WHERE sc.student.studentNumber = :studentNumber AND sc.course.courseCode = :courseCode")
+    Optional<StudentCourse> findByStudentNumberAndCourseCode(@Param("studentNumber") String studentNumber,
+            @Param("courseCode") String courseCode);
 
-    @Query("SELECT sc FROM StudentCourse sc WHERE sc.course.id = :courseId")
-    List<StudentCourse> findByCourseId(@Param("courseId") UUID courseId);
+    @Query("SELECT sc FROM StudentCourse sc WHERE sc.student.studentNumber = :studentNumber")
+    List<StudentCourse> findByStudentNumber(@Param("studentNumber") String studentNumber);
 
-    @Query("SELECT sc FROM StudentCourse sc WHERE sc.enrollmentDate = :date")
-    List<StudentCourse> findByEnrollmentDate(@Param("date") LocalDate date);
+    @Query("SELECT sc FROM StudentCourse sc WHERE sc.course.courseCode = :courseCode")
+    List<StudentCourse> findByCourseCode(@Param("courseCode") String courseCode);
 
-    @Query("SELECT sc FROM StudentCourse sc WHERE sc.enrollmentDate BETWEEN :startDate AND :endDate")
-    List<StudentCourse> findByEnrollmentDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    @Query("SELECT COUNT(sc) FROM StudentCourse sc WHERE sc.course.courseCode = :courseCode")
+    Long countByCourseCode(@Param("courseCode") String courseCode);
 
-    boolean existsByStudentIdAndCourseId(UUID studentId, UUID courseId);
-    
-    @Query("SELECT COUNT(sc) FROM StudentCourse sc WHERE sc.course.id = :courseId")
-    Long countByCourseId(@Param("courseId") UUID courseId);
-    
-    @Query("SELECT COUNT(sc) FROM StudentCourse sc WHERE sc.student.id = :studentId")
-    Long countByStudentId(@Param("studentId") UUID studentId);
+    @Query("SELECT COUNT(sc) FROM StudentCourse sc WHERE sc.student.studentNumber = :studentNumber")
+    Long countByStudentNumber(@Param("studentNumber") String studentNumber);
 }

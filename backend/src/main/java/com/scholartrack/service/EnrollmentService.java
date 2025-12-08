@@ -43,23 +43,36 @@ public class EnrollmentService {
 
     @Transactional(readOnly = true)
     public List<StudentCourse> findByStudentId(UUID studentId) {
-        return enrollmentRepository.findByStudentId(studentId);
+        var student = studentRepository.findById(studentId).orElse(null);
+        if (student == null) {
+            return List.of();
+        }
+        return enrollmentRepository.findByStudentNumber(student.getStudentNumber());
     }
 
     @Transactional(readOnly = true)
     public List<StudentCourse> findByCourseId(UUID courseId) {
-        return enrollmentRepository.findByCourseId(courseId);
+        var course = courseRepository.findById(courseId).orElse(null);
+        if (course == null) {
+            return List.of();
+        }
+        return enrollmentRepository.findByCourseCode(course.getCourseCode());
     }
 
     @Transactional(readOnly = true)
     public Optional<StudentCourse> findByStudentIdAndCourseId(UUID studentId, UUID courseId) {
-        return enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId);
+        var student = studentRepository.findById(studentId).orElse(null);
+        var course = courseRepository.findById(courseId).orElse(null);
+        if (student == null || course == null) {
+            return Optional.empty();
+        }
+        return enrollmentRepository.findByStudentNumberAndCourseCode(student.getStudentNumber(), course.getCourseCode());
     }
 
     public StudentCourse enrollStudent(UUID studentId, UUID courseId) {
         var student = studentRepository.findById(studentId).orElseThrow();
         var course = courseRepository.findById(courseId).orElseThrow();
-        var existing = enrollmentRepository.findByStudentIdAndCourseId(student.getId(), course.getId());
+        var existing = enrollmentRepository.findByStudentNumberAndCourseCode(student.getStudentNumber(), course.getCourseCode());
         if (existing.isPresent()) {
             return existing.get();
         }
@@ -73,7 +86,7 @@ public class EnrollmentService {
     public StudentCourse enrollByStudentNumberAndCourseCode(String studentNumber, String courseCode) {
         var student = studentRepository.findByStudentNumber(studentNumber).orElseThrow();
         var course = courseRepository.findByCourseCode(courseCode).orElseThrow();
-        var existing = enrollmentRepository.findByStudentIdAndCourseId(student.getId(), course.getId());
+        var existing = enrollmentRepository.findByStudentNumberAndCourseCode(student.getStudentNumber(), course.getCourseCode());
         if (existing.isPresent()) {
             return existing.get();
         }
@@ -89,7 +102,7 @@ public class EnrollmentService {
         var course = courseRepository.findByCourseCode(courseCode).orElseThrow();
         for (String studentNumber : studentNumbers) {
             var student = studentRepository.findByStudentNumber(studentNumber).orElseThrow();
-            var existing = enrollmentRepository.findByStudentIdAndCourseId(student.getId(), course.getId());
+            var existing = enrollmentRepository.findByStudentNumberAndCourseCode(student.getStudentNumber(), course.getCourseCode());
             if (existing.isPresent()) {
                 continue;
             }
@@ -107,7 +120,7 @@ public class EnrollmentService {
         var student = studentRepository.findByStudentNumber(studentNumber).orElseThrow();
         for (String courseCode : courseCodes) {
             var course = courseRepository.findByCourseCode(courseCode).orElseThrow();
-            var existing = enrollmentRepository.findByStudentIdAndCourseId(student.getId(), course.getId());
+            var existing = enrollmentRepository.findByStudentNumberAndCourseCode(student.getStudentNumber(), course.getCourseCode());
             if (existing.isPresent()) {
                 continue;
             }
@@ -121,7 +134,12 @@ public class EnrollmentService {
     }
 
     public void unenrollStudent(UUID studentId, UUID courseId) {
-        enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)
+        var student = studentRepository.findById(studentId).orElse(null);
+        var course = courseRepository.findById(courseId).orElse(null);
+        if (student == null || course == null) {
+            return;
+        }
+        enrollmentRepository.findByStudentNumberAndCourseCode(student.getStudentNumber(), course.getCourseCode())
                 .ifPresent(enrollmentRepository::delete);
     }
 
@@ -136,11 +154,19 @@ public class EnrollmentService {
 
     @Transactional(readOnly = true)
     public Long getStudentCountByCourseId(UUID courseId) {
-        return enrollmentRepository.countByCourseId(courseId);
+        var course = courseRepository.findById(courseId).orElse(null);
+        if (course == null) {
+            return 0L;
+        }
+        return enrollmentRepository.countByCourseCode(course.getCourseCode());
     }
 
     @Transactional(readOnly = true)
     public Long getCourseCountByStudentId(UUID studentId) {
-        return enrollmentRepository.countByStudentId(studentId);
+        var student = studentRepository.findById(studentId).orElse(null);
+        if (student == null) {
+            return 0L;
+        }
+        return enrollmentRepository.countByStudentNumber(student.getStudentNumber());
     }
 }

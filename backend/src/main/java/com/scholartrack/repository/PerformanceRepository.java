@@ -38,6 +38,9 @@ public interface PerformanceRepository extends JpaRepository<Performance, UUID> 
     
     @Query("SELECT p FROM Performance p WHERE p.student.id = :studentId AND p.assignment.course.id = :courseId")
     List<Performance> findByStudentIdAndCourseId(@Param("studentId") UUID studentId, @Param("courseId") UUID courseId);
+
+    @Query("SELECT p FROM Performance p WHERE p.assignment.course.id = :courseId")
+    List<Performance> findByCourseId(@Param("courseId") UUID courseId);
 }
 
 

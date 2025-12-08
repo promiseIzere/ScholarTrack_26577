@@ -1,7 +1,11 @@
 package com.scholartrack.service;
 
 import com.scholartrack.model.Attendance;
+import com.scholartrack.model.Student;
+import com.scholartrack.model.Course;
 import com.scholartrack.repository.AttendanceRepository;
+import com.scholartrack.repository.StudentRepository;
+import com.scholartrack.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +21,42 @@ public class AttendanceService {
 
     @Autowired
     private AttendanceRepository attendanceRepository;
+    
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
 
     public Attendance create(Attendance attendance) {
-        return attendanceRepository.save(attendance);
+        // Attach managed Student
+        if (attendance.getStudent() == null || attendance.getStudent().getId() == null) {
+            throw new IllegalArgumentException("student.id is required");
+        }
+        UUID studentId = attendance.getStudent().getId();
+        Student managedStudent = studentRepository.findById(studentId)
+            .orElseThrow(() -> new IllegalArgumentException("Student not found: " + studentId));
+
+        // Attach managed Course
+        if (attendance.getCourse() == null || attendance.getCourse().getId() == null) {
+            throw new IllegalArgumentException("course.id is required");
+        }
+        UUID courseId = attendance.getCourse().getId();
+        Course managedCourse = courseRepository.findById(courseId)
+            .orElseThrow(() -> new IllegalArgumentException("Course not found: " + courseId));
+
+        // Build a fresh managed entity to avoid partially-bound associations
+        Attendance toSave = new Attendance();
+        toSave.setStudent(managedStudent);
+        toSave.setCourse(managedCourse);
+        toSave.setAttendanceDate(attendance.getAttendanceDate() != null ? attendance.getAttendanceDate() : LocalDate.now());
+        if (attendance.getStatus() == null || attendance.getStatus().trim().isEmpty()) {
+            throw new IllegalArgumentException("status is required");
+        }
+        toSave.setStatus(attendance.getStatus());
+        toSave.setRemarks(attendance.getRemarks());
+
+        return attendanceRepository.save(toSave);
     }
 
     @Transactional(readOnly = true)
