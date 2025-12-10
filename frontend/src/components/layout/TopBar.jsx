@@ -1,7 +1,7 @@
 import React from "react";
 import { Bell, Search, User } from "lucide-react";
 import { Link } from "react-router-dom";
-import InputFields from "./ui/InputFields";
+import InputFields from "../ui/InputFields";
 
 function TopBar() {
   return (

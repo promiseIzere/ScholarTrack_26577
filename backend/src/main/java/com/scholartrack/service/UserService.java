@@ -7,6 +7,7 @@ import com.scholartrack.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +24,16 @@ public class UserService {
     @Autowired
     private LocationRepository locationRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public User create(User user) {
+
+        if(user.getPassword() != null) {
+            String hashedPassword = passwordEncoder.encode(user.getPassword());
+            user.setPassword(hashedPassword);
+        }
+
         user.setCreatedAt(LocalDateTime.now());
         if (user.getLocation() != null) {
             Location provided = user.getLocation();
