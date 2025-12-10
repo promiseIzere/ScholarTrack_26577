@@ -1,5 +1,5 @@
 import React from 'react'
-import StatCard from './StatCard'
+import StatCard from '../components/StatCard'
 import {
   Users,
   Book,
@@ -25,7 +25,7 @@ import {
   YAxis,
   ComposedChart,
 } from 'recharts'
-import MyAssignments from './MyAssignments'
+import MyAssignments from '../components/MyAssignments'
 
 function Dashboard() {
   const performanceData = [
