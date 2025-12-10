@@ -31,12 +31,6 @@ public class UserService {
             if (provided.getId() != null) {
                 attached = locationRepository.findById(provided.getId()).orElse(null);
             }
-            if (attached == null && provided.getCode() != null) {
-                attached = locationRepository.findByCode(provided.getCode()).orElse(null);
-            }
-            if (attached == null && (provided.getName() != null || provided.getCode() != null)) {
-                attached = locationRepository.save(provided);
-            }
             user.setLocation(attached);
         }
         return userRepository.save(user);
@@ -83,18 +77,8 @@ public class UserService {
             existing.setStatus(update.getStatus());
             existing.setUpdatedAt(LocalDateTime.now());
             // Update location if provided
-            if (update.getLocation() != null) {
-                Location provided = update.getLocation();
-                Location attached = null;
-                if (provided.getId() != null) {
-                    attached = locationRepository.findById(provided.getId()).orElse(null);
-                }
-                if (attached == null && provided.getCode() != null) {
-                    attached = locationRepository.findByCode(provided.getCode()).orElse(null);
-                }
-                if (attached == null && (provided.getName() != null || provided.getCode() != null)) {
-                    attached = locationRepository.save(provided);
-                }
+            if (update.getLocation() != null && update.getLocation().getId() != null) {
+                Location attached = locationRepository.findById(update.getLocation().getId()).orElse(null);
                 existing.setLocation(attached);
             }
             return existing;

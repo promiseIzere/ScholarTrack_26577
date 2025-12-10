@@ -1,8 +1,8 @@
 package com.scholartrack.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-// import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +10,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "students")
 @JsonIgnoreProperties({ "studentCourses", "performances", "attendanceRecords", "hibernateLazyInitializer", "handler" })
-// @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Student {
 
     @Id
@@ -21,13 +20,16 @@ public class Student {
     @Column(name = "student_number", nullable = false, unique = true)
     private String studentNumber;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
+
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String email;
 
     @Column
@@ -43,9 +45,9 @@ public class Student {
     @Column(nullable = false)
     private Status status = Status.ACTIVE;
 
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "location_id", nullable = false)
-    private Location location;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "village_id", nullable = false)
+    private Location village;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<StudentCourse> studentCourses;
@@ -63,15 +65,10 @@ public class Student {
     public Student() {
     }
 
-    public Student(String studentNumber, String firstName, String lastName, String email, String gender,
-            LocalDate dateOfBirth, Location location) {
+    public Student(String studentNumber, String fullName, Location village) {
         this.studentNumber = studentNumber;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.gender = gender;
-        this.dateOfBirth = dateOfBirth;
-        this.location = location;
+        this.fullName = fullName;
+        this.village = village;
     }
 
     public UUID getId() {
@@ -88,6 +85,14 @@ public class Student {
 
     public void setStudentNumber(String studentNumber) {
         this.studentNumber = studentNumber;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getFirstName() {
@@ -146,12 +151,12 @@ public class Student {
         this.status = status;
     }
 
-    public Location getLocation() {
-        return location;
+    public Location getVillage() {
+        return village;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setVillage(Location village) {
+        this.village = village;
     }
 
     public List<StudentCourse> getStudentCourses() {

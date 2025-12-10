@@ -1,70 +1,59 @@
 package com.scholartrack.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.scholartrack.dto.LocationCreateDTO;
 import com.scholartrack.model.Location;
 import com.scholartrack.service.LocationService;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/location")
+@RequestMapping("/api/locations")
+@CrossOrigin(origins = "*")
 public class LocationController {
-    
-    @Autowired
-    private LocationService locationService;
 
-    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> saveParent(@RequestBody Location location){
-        
-        String response = locationService.saveProvince(location);
+    private final LocationService locationService;
 
-        if(response.equals("Parent saved succesfully")){
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        }
-        else{
-            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
-        }
+    public LocationController(LocationService locationService) {
+        this.locationService = locationService;
     }
 
-    @PostMapping(value="/saveChild", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> saveChildren(@RequestBody Location location, @RequestParam String parentCode){
-        return ResponseEntity.ok(locationService.saveChildren(parentCode, location));
+    @PostMapping("/province")
+    public ResponseEntity<Location> createProvince(@Valid @RequestBody LocationCreateDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.createProvince(request));
     }
 
-    @GetMapping(value = "/getLocation")
-    public ResponseEntity<?> getLocation(@RequestParam String code){
-        return ResponseEntity.ok(locationService.getLocation(code));
+    @PostMapping("/district")
+    public ResponseEntity<Location> createDistrict(@Valid @RequestBody LocationCreateDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.createDistrict(request));
     }
 
-    @GetMapping(value = "/getProvinceNameBySector")
-    public ResponseEntity<?> getProvinceNameBySector(@RequestParam String code){
-        return ResponseEntity.ok(locationService.getProvinceBySector(code));
+    @PostMapping("/sector")
+    public ResponseEntity<Location> createSector(@Valid @RequestBody LocationCreateDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.createSector(request));
     }
 
-    @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateLocation(@RequestParam String code, @RequestBody Location location){
-        return locationService.updateByCode(code, location)
-            .<ResponseEntity<?>>map(ResponseEntity::ok)
-            .orElse(new ResponseEntity<>("Location not found", HttpStatus.NOT_FOUND));
+    @PostMapping("/cell")
+    public ResponseEntity<Location> createCell(@Valid @RequestBody LocationCreateDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.createCell(request));
     }
 
-    @DeleteMapping(value = "/delete")
-    public ResponseEntity<?> deleteLocation(@RequestParam String code){
-        boolean deleted = locationService.deleteByCode(code);
-        if(deleted){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>("Location not found", HttpStatus.NOT_FOUND);
-        }
+    @PostMapping("/village")
+    public ResponseEntity<Location> createVillage(@Valid @RequestBody LocationCreateDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.createVillage(request));
+    }
+
+    @GetMapping("/children/{parentId}")
+    public ResponseEntity<Page<Location>> getChildren(@PathVariable UUID parentId,
+                                                      @RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "20") int size) {
+        PageRequest pageable = PageRequest.of(Math.max(page,0), Math.max(size,1));
+        return ResponseEntity.ok(locationService.getChildrenByParent(parentId, pageable));
     }
 }

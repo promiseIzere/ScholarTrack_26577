@@ -1,111 +1,112 @@
 package com.scholartrack.service;
 
-
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.scholartrack.dto.LocationCreateDTO;
+import com.scholartrack.exception.BadRequestException;
+import com.scholartrack.exception.ConflictException;
+import com.scholartrack.exception.NotFoundException;
 import com.scholartrack.model.Location;
+import com.scholartrack.model.ELocationType;
 import com.scholartrack.repository.LocationRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
+@Transactional
 public class LocationService {
 
-    @Autowired
-    private LocationRepository locationRepo;
+    private final LocationRepository locationRepository;
 
-    public String saveProvince(Location location){
-        if(!locationRepo.existsByCode(location.getCode())){
-            locationRepo.save(location);
-            return "Parent saved succesfully";
+    public LocationService(LocationRepository locationRepository) {
+        this.locationRepository = locationRepository;
+    }
+
+    public Location createProvince(LocationCreateDTO dto) {
+        return persistLocation(dto, ELocationType.PROVINCE, null);
+    }
+
+    public Location createDistrict(LocationCreateDTO dto) {
+        Location parent = loadAndValidateParent(dto.parentCode(), ELocationType.PROVINCE, "Province");
+        return persistLocation(dto, ELocationType.DISTRICT, parent);
+    }
+
+    public Location createSector(LocationCreateDTO dto) {
+        Location parent = loadAndValidateParent(dto.parentCode(), ELocationType.DISTRICT, "District");
+        return persistLocation(dto, ELocationType.SECTOR, parent);
+    }
+
+    public Location createCell(LocationCreateDTO dto) {
+        Location parent = loadAndValidateParent(dto.parentCode(), ELocationType.SECTOR, "Sector");
+        return persistLocation(dto, ELocationType.CELL, parent);
+    }
+
+    public Location createVillage(LocationCreateDTO dto) {
+        Location parent = loadAndValidateParent(dto.parentCode(), ELocationType.CELL, "Cell");
+        return persistLocation(dto, ELocationType.VILLAGE, parent);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Location> getChildrenByParent(UUID parentId, Pageable pageable) {
+        Location parent = locationRepository.findById(parentId)
+                .orElseThrow(() -> new NotFoundException("Parent location not found with id " + parentId));
+        return locationRepository.findByParent(parent, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Location> getHierarchy(Location location) {
+        Objects.requireNonNull(location, "location is required");
+        Deque<Location> stack = new ArrayDeque<>();
+        Location current = location;
+        while (current != null) {
+            stack.push(current);
+            current = current.getParent();
         }
-        else{
-            return "Parent location already exists";
+        return new ArrayList<>(stack);
+    }
+
+    private Location persistLocation(LocationCreateDTO dto, ELocationType type, Location parent) {
+        validateName(dto.name());
+        validateCode(dto.code());
+        if (locationRepository.existsByCode(dto.code().trim())) {
+            throw new ConflictException("Location with code '" + dto.code() + "' already exists");
+        }
+        locationRepository.findByNameAndType(dto.name().trim(), type).ifPresent(existing -> {
+            throw new ConflictException("Location with name '" + dto.name() + "' already exists for level " + type);
+        });
+        Location location = new Location(dto.name().trim(), dto.code().trim(), type, parent);
+        return locationRepository.save(location);
+    }
+
+    private Location loadAndValidateParent(String parentCode, ELocationType expectedType, String expectedLabel) {
+        if (parentCode == null || parentCode.isBlank()) {
+            throw new BadRequestException(expectedLabel + " parentCode is required");
+        }
+        Location parent = locationRepository.findByCode(parentCode.trim())
+                .orElseThrow(() -> new NotFoundException(expectedLabel + " not found with code " + parentCode));
+        if (parent.getType() != expectedType) {
+            throw new BadRequestException("Parent must be a " + expectedLabel.toLowerCase() + " when creating this location");
+        }
+        return parent;
+    }
+
+    private void validateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new BadRequestException("Location name is required");
         }
     }
 
-    public String saveChildren(String parentCode, Location location){
-
-        if(parentCode != null){
-            Optional<Location> getParent = locationRepo.findByCode(parentCode);
-
-            if(getParent.isPresent()){
-                location.setParent(getParent.get());
-
-                    if(!locationRepo.existsByCode(location.getCode())){
-                        locationRepo.save(location);
-                        return "child is saved successfully";
-                    }else{
-                        return "child with this code exists";
-                    }
-                
-            }else{
-                return "The parent with this code does not exist";
-            }
-        }else{
-                if(!locationRepo.existsByCode(location.getCode())){
-                locationRepo.save(location);
-                        return "parent is saved successfully";
-                }else{
-                        return "parent exists";
-                }
-            }
-    }
-
-    public Optional<Location> getLocation(String code){
-        return locationRepo.findByCode(code);
-    }
-
-    public String getProvinceBySector(String code){
-        Optional<Location> response = locationRepo.findByCode(code);
-        if(response.isPresent()){
-            Location location = response.get();
-            return location.getParent().getParent().getName();
+    private void validateCode(String code) {
+        if (code == null || code.isBlank()) {
+            throw new BadRequestException("Location code is required");
         }
-        else{
-            return "No location found";
-        }
-    }
-
-    public Optional<Location> updateByCode(String code, Location updates){
-        Optional<Location> existingOpt = locationRepo.findByCode(code);
-        if(existingOpt.isEmpty()){
-            return Optional.empty();
-        }
-
-        Location existing = existingOpt.get();
-
-        if(updates.getName() != null){
-            existing.setName(updates.getName());
-        }
-        if(updates.getCode() != null){
-            existing.setCode(updates.getCode());
-        }
-        if(updates.getType() != null){
-            existing.setType(updates.getType());
-        }
-        if(updates.getParent() != null){
-            Location providedParent = updates.getParent();
-            if(providedParent.getId() != null){
-                locationRepo.findById(providedParent.getId()).ifPresent(existing::setParent);
-            } else if(providedParent.getCode() != null){
-                locationRepo.findByCode(providedParent.getCode()).ifPresent(existing::setParent);
-            } else {
-                existing.setParent(null);
-            }
-        }
-
-        return Optional.of(locationRepo.save(existing));
-    }
-
-
-    public boolean deleteByCode(String code){
-        Optional<Location> existing = locationRepo.findByCode(code);
-        if(existing.isEmpty()){
-            return false;
-        }
-        locationRepo.delete(existing.get());
-        return true;
     }
 }
