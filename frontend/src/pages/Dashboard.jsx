@@ -1,5 +1,5 @@
 import React from 'react'
-import StatCard from '../components/StatCard'
+import StatCard from '../components/ui/StatCard'
 import {
   Users,
   Book,
@@ -12,8 +12,7 @@ import {
   Palette,
 } from 'lucide-react'
 import {
-  Area,
-  AreaChart,
+
   Bar,
   BarChart,
   CartesianGrid,
@@ -25,7 +24,7 @@ import {
   YAxis,
   ComposedChart,
 } from 'recharts'
-import MyAssignments from '../components/MyAssignments'
+import MyAssignments from '../components/tables/MyAssignments'
 
 function Dashboard() {
   const performanceData = [
