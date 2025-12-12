@@ -33,7 +33,7 @@ function Sidebar() {
           </Link>
         ))}
         </div>
-        <Link to="/logout" className="flex items-center gap-5 px-4 py-2 rounded-lg transition-colors text-gray-800 hover:bg-cyan-700 hover:text-white">
+        <Link to="/login" className="flex items-center gap-5 px-4 py-2 rounded-lg transition-colors text-gray-800 hover:bg-cyan-700 hover:text-white">
           <LogOut strokeWidth={2} />
           <span className="font-lato-regular">Logout</span>
         </Link>

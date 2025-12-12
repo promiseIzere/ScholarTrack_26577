@@ -2,16 +2,22 @@ import React, { useState } from "react";
 import InputFields from "../../components/ui/InputFields";
 import logo from "../../assets/scolarTrack_logo.png";
 import { User, Lock, LogIn, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Radio from "../../components/ui/Radio";
 
 function LoginForm({ setIsLogin, rememberMe, setRememberMe }) {
   const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
+  const handleLogin = () => {
+    // need to send the login data to the backend
+    navigate("/dashboard");
+    console.log("Login");
+  }
 
   return (
     <div className="flex flex-col justify-end py-24 px-10 bg-gray-100/90 backdrop-blur-sm w-full sm:w-1/2 ml-auto space-y-4">
@@ -92,6 +98,7 @@ function LoginForm({ setIsLogin, rememberMe, setRememberMe }) {
           icon={<LogIn size={18} />}
           type="button"
           className="bg-cyan-900 w-full text-white p-2 rounded-full"
+          onClick={handleLogin}
         >
           Login
         </Button>
